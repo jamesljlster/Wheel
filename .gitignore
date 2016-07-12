@@ -1,0 +1,11 @@
+# Ignored Project File
+*.layout
+*.depend
+
+# Bin
+Wheel_Develop/bin
+Wheel_Develop/lib
+Wheel_Develop/obj
+
+# Lib Doc
+Wheel_Develop/LibSerialPort/doc
