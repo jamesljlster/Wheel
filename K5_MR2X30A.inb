@@ -6,7 +6,7 @@
 Const baudmode As Word = (4096 - (2000000 \ BAUDRATE))
 
 ' Module Declaration
-Peripheral myMotor As MR2x30A @ 11	'Control Board ID
+Peripheral myMotor As MR2x30A @ 0	'Control Board ID
 
 ' Program Constant
 #DEFINE	BUFFER_LENGTH	7
