@@ -42,11 +42,9 @@ Sub CtrlMotor(SAL As Integer, SAR As Integer)
 		
 		If SAL > STOP_SPEED Then
 			leftSpeed = SAL - STOP_SPEED
-			leftSpeed = leftSpeed * 4
 			myMotorL.Forward(leftSpeed)
 		Elseif SAL < STOP_SPEED Then
 			leftSpeed = STOP_SPEED - SAL
-			leftSpeed = leftSpeed * 4
 			myMotorL.Backward(leftSpeed)
 		Else
 			myMotorL.Brake()
@@ -54,11 +52,9 @@ Sub CtrlMotor(SAL As Integer, SAR As Integer)
 		
 		If SAR > STOP_SPEED Then
 			rightSpeed = SAR - STOP_SPEED
-			rightSpeed = rightSpeed * 4
 			myMotorR.Forward(rightSpeed)
 		Elseif SAR < STOP_SPEED Then
 			rightSpeed = STOP_SPEED - SAR
-			rightSpeed = rightSpeed * 4
 			myMotorR.Backward(rightSpeed)
 		Else
 			myMotorR.Brake()
