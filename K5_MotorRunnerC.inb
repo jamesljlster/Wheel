@@ -1,0 +1,98 @@
+' Serial Configuration
+#DEFINE RX_PIN		1
+#DEFINE	TX_PIN		0
+#DEFINE	BAUDRATE	38400
+
+Const baudmode As Word = (4096 - (2000000 \ BAUDRATE))
+
+' Module Declaration
+Peripheral myMotorL As MotorRunnerC @ 0	' Left Control Board ID
+Peripheral myMotorR As MotorRunnerC @ 1	' Right Control Board ID
+
+' Program Constant
+#DEFINE	BUFFER_LENGTH	7
+#DEFINE HEAD_CHAR		"W"c
+#DEFINE	ASCII_0			48
+#DEFINE STOP_SPEED		255
+
+' Global Variables
+Dim recvBuf As String * 7
+
+'#DEFINE DEBUG_MODE
+
+Sub main()
+
+	Dim SAL, SAR As Integer
+	Dim tmpRead As String * 7
+
+	Do
+		RecvString()
+		Decode(SAL, SAR)
+		CtrlMotor(SAL, SAR)
+		
+		Serout TX_PIN, baudmode, [recvBuf]
+	Loop
+
+End Sub
+
+Sub CtrlMotor(SAL As Integer, SAR As Integer)
+	Dim leftSpeed, rightSpeed As Integer
+	
+	If SAL >= 0 And SAL <= 510 And SAR >= 0 And SAR <= 510 Then
+		
+		If SAL > STOP_SPEED Then
+			leftSpeed = SAL - STOP_SPEED
+			leftSpeed = leftSpeed * 4
+			myMotorL.Forward(leftSpeed)
+		Elseif SAL < STOP_SPEED Then
+			leftSpeed = STOP_SPEED - SAL
+			leftSpeed = leftSpeed * 4
+			myMotorL.Backward(leftSpeed)
+		Else
+			myMotorL.Brake()
+		End If
+		
+		If SAR > STOP_SPEED Then
+			rightSpeed = SAR - STOP_SPEED
+			rightSpeed = rightSpeed * 4
+			myMotorR.Forward(rightSpeed)
+		Elseif SAR < STOP_SPEED Then
+			rightSpeed = STOP_SPEED - SAR
+			rightSpeed = rightSpeed * 4
+			myMotorR.Backward(rightSpeed)
+		Else
+			myMotorR.Brake()
+		End If
+		
+	End If
+	
+End Sub
+
+Sub Decode(Byref SAL As Integer, Byref SAR As Integer)
+
+	SAL = 100 * (recvBuf(1) - ASCII_0) + 10 * (recvBuf(2) - ASCII_0) + (recvBuf(3) - ASCII_0)
+	SAR = 100 * (recvBuf(4) - ASCII_0) + 10 * (recvBuf(5) - ASCII_0) + (recvBuf(6) - ASCII_0)
+	
+	#IFDEF DEBUG_MODE
+	Debug "SAL = ", SAL, CR
+	Debug "SAR = ", SAR, CR
+	Debug CR
+	#ENDIF
+	
+End Sub
+
+Sub RecvString()
+	Do
+		Serin RX_PIN, baudmode, [recvBuf | BUFFER_LENGTH]
+		
+		#IFDEF DEBUG_MODE
+		Debug "RecvBuf = ", recvBuf, CR
+		#ENDIF
+		
+		If recvBuf(0) <> HEAD_CHAR Then
+			Continue
+		Else
+			Exit Do
+		End If
+	Loop
+End Sub
