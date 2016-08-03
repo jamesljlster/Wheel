@@ -24,6 +24,8 @@ Sub main()
 
 	Dim SAL, SAR As Integer
 	Dim tmpRead As String * 7
+	
+	CtrlMotor(255, 255)
 
 	Do
 		RecvString()
