@@ -11,20 +11,28 @@ int main()
     int iResult;
     WCTRL wCtrl;
 
-    iResult = WCTRL_Init(&wCtrl, "COM3", 38400);
+    iResult = WCTRL_Init(&wCtrl, "COM4", 38400);
     if(iResult != WCTRL_NO_ERROR)
     {
         return -1;
     }
 
-    for(i = 0; i < 255; i++)
+    for(i = 0; i <= 70; i++)
     {
+        if(kbhit())
+        {
+            if(getch() == 27)
+            {
+                break;
+            }
+        }
+
+        printf("Send: %d, %d\n", i, 510 - i);
         iResult = WCTRL_Control(wCtrl, i, 510 - i);
         if(iResult != WCTRL_NO_ERROR)
         {
             return -1;
         }
-
         Sleep(100);
     }
 

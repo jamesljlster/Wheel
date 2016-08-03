@@ -32,8 +32,17 @@ int WCTRL_Init(WCTRL* wheelCtrlPtr, const char* deviceName, int baudrate)
         return WCTRL_SERIAL_FAILED;
     }
 
-    // Set baudrate
+    // Set Baudrate
     iResult = sp_set_baudrate(serialPort, baudrate);
+    if(iResult != SP_OK)
+    {
+        sp_close(serialPort);
+        sp_free_port(serialPort);
+        return WCTRL_SERIAL_FAILED;
+    }
+
+    // Set Bits of Byte
+    iResult = sp_set_bits(serialPort, 8);
     if(iResult != SP_OK)
     {
         sp_close(serialPort);
