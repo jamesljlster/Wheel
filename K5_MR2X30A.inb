@@ -23,13 +23,15 @@ Sub main()
 
 	Dim SAL, SAR As Integer
 	Dim tmpRead As String * 7
+	
+	CtrlMotor(255, 255)
 
 	Do
 		RecvString()
 		Decode(SAL, SAR)
 		CtrlMotor(SAL, SAR)
 		
-		'Serout TX_PIN, baudmode, [recvBuf]
+		Serout TX_PIN, baudmode, [recvBuf]
 	Loop
 
 End Sub
