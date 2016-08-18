@@ -15,7 +15,7 @@ extern "C" {
 #endif // __cplusplus
 
 int WCTRL_Init(WCTRL* wheelCtrlPtr, const char* deviceName, int baudrate);
-int WCTRL_Control(WCTRL wheelCtrl, int leftSpeed, int rightSpeed);
+int WCTRL_Control(WCTRL wheelCtrl, int leftSpeed, int rightSpeed, int delay);
 int WCTRL_Close(WCTRL wheelCtrl);
 
 #ifdef __cplusplus

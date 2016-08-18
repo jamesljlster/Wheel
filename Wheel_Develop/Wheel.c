@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <libserialport.h>
 
 #include "Wheel.h"
@@ -56,7 +57,7 @@ int WCTRL_Init(WCTRL* wheelCtrlPtr, const char* deviceName, int baudrate)
     return WCTRL_NO_ERROR;
 }
 
-int WCTRL_Control(WCTRL wheelCtrl, int leftSpeed, int rightSpeed)
+int WCTRL_Control(WCTRL wheelCtrl, int leftSpeed, int rightSpeed, int delay)
 {
     int iResult;
     char ctrlBuf[WCTRL_BUFLEN + 1] = {0};
@@ -81,6 +82,9 @@ int WCTRL_Control(WCTRL wheelCtrl, int leftSpeed, int rightSpeed)
     {
         return WCTRL_SERIAL_FAILED;
     }
+
+    // Delay
+    usleep(delay);
 
     return WCTRL_NO_ERROR;
 }

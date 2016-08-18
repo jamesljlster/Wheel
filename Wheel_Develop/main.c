@@ -28,7 +28,7 @@ int main()
         }
 
         printf("Send: %d, %d\n", i, 510 - i);
-        iResult = WCTRL_Control(wCtrl, i, 510 - i);
+        iResult = WCTRL_Control(wCtrl, i, 510 - i, 10);
         if(iResult != WCTRL_NO_ERROR)
         {
             return -1;
