@@ -84,7 +84,7 @@ int WCTRL_Control(WCTRL wheelCtrl, int leftSpeed, int rightSpeed, int delay)
     }
 
     // Delay
-    usleep(delay);
+    usleep(delay * 1000);
 
     return WCTRL_NO_ERROR;
 }
