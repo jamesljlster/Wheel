@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
     WCTRL wCtrl;
 
 	// Check main args
-	if(argc < 3)
+	if(argc < 4)
 	{
 		printf("Use the following syntax to run Wheel test program:\n");
 		printf("\tWheel_test <Device_Path> <Device_Baudrate> <Control_Delay (ms)>\n\n");
@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-    iResult = WCTRL_Init(&wCtrl, argv[0], atoi(argv[1]));
+    iResult = WCTRL_Init(&wCtrl, argv[1], atoi(argv[2]));
     if(iResult != WCTRL_NO_ERROR)
     {
 		printf("Failed to open Wheel device!\n");
@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
     }
 	
 	// Find control delay
-	ctrlDelay = atoi(argv[2]);
+	ctrlDelay = atoi(argv[3]);
 	
 	// Manual controlling
 	printf("Press WASD to test Wheel, or ESC to exit...\n");
