@@ -1,11 +1,10 @@
-# Ignored Project File
+# Project file
 *.layout
 *.depend
+*.cbp
 
-# Bin
-Wheel_Develop/bin
-Wheel_Develop/lib
-Wheel_Develop/obj
+# Build folder
+build
 
-# Lib Doc
-Wheel_Develop/LibSerialPort/doc
+# Temp file
+*.swp
