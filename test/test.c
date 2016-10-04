@@ -1,44 +1,101 @@
 #include <stdio.h>
 #include <conio.h>
+#include <ctype.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 #include <Wheel.h>
 
-int main()
+#define BASE_SPEED 330
+
+int main(int argc, char* argv[])
 {
     int i;
     int iResult;
+	int ctrlDelay;
+	int leftSpeed;
+	int rightSpeed;
+	char kbin;
     WCTRL wCtrl;
 
-    iResult = WCTRL_Init(&wCtrl, "COM4", 38400);
+	// Check main args
+	if(argc < 3)
+	{
+		printf("Use the following syntax to run Wheel test program:\n");
+		printf("\tWheel_test <Device_Path> <Device_Baudrate> <Control_Delay (ms)>\n\n");
+		printf("Example: \n");
+		printf("(Windows):\tWheel_test COM4 38400 20\n");
+		printf("(Linux):\tWheel_test /dev/ttyS0 38400 0\n");
+		printf("\n");
+
+		return -1;
+	}
+
+    iResult = WCTRL_Init(&wCtrl, argv[0], atoi(argv[1]));
     if(iResult != WCTRL_NO_ERROR)
     {
+		printf("Failed to open Wheel device!\n");
         return -1;
     }
+	
+	// Find control delay
+	ctrlDelay = atoi(argv[2]);
+	
+	// Manual controlling
+	printf("Press WASD to test Wheel, or ESC to exit...\n");
+	kbin = 0;
+	while(kbin != 27)
+	{
+		if(kbhit())
+		{
+			kbin = getch();
+			switch(toupper(kbin))
+			{
+			case 'W':
+				leftSpeed = BASE_SPEED;
+				rightSpeed = BASE_SPEED;
+				break;
 
-    for(i = 0; i <= 70; i++)
-    {
-        if(kbhit())
-        {
-            if(getch() == 27)
-            {
-                break;
-            }
-        }
+			case 'A':
+				leftSpeed = 510 - BASE_SPEED;
+				rightSpeed = BASE_SPEED;
+				break;
 
-        printf("Send: %d, %d\n", i, 510 - i);
-        iResult = WCTRL_Control(wCtrl, i, 510 - i, 10);
+			case 'S':
+				leftSpeed = 510 - BASE_SPEED;
+				rightSpeed = 510 - BASE_SPEED;
+				break;
+
+			case 'D':
+				leftSpeed = BASE_SPEED;
+				rightSpeed = 510 - BASE_SPEED;
+				break;
+
+			default:
+				leftSpeed = 255;
+				rightSpeed = 255;
+			}
+		}
+		else
+		{
+			leftSpeed = 255;
+			rightSpeed = 255;
+		}
+		
+		// Controlling
+		iResult = WCTRL_Control(wCtrl, leftSpeed, rightSpeed, ctrlDelay);
         if(iResult != WCTRL_NO_ERROR)
         {
+			printf("Wheel control failed!\n");
             return -1;
         }
-        usleep(100000);
-    }
+	}
 
+	// Cleanup
     iResult = WCTRL_Close(wCtrl);
     if(iResult != WCTRL_NO_ERROR)
     {
+		printf("Failed to close device!\n");
         return -1;
     }
 
