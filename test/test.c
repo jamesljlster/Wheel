@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <conio.h>
 #include <stdlib.h>
-#include <windows.h>
+#include <unistd.h>
 
-#include "Wheel.h"
+#include <Wheel.h>
 
 int main()
 {
@@ -33,7 +33,7 @@ int main()
         {
             return -1;
         }
-        Sleep(100);
+        usleep(100000);
     }
 
     iResult = WCTRL_Close(wCtrl);
