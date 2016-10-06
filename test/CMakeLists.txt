@@ -34,7 +34,13 @@ if(UNIX)
 		${WHEEL_TEST_DEPS}
 		${CONIO_LIB}
 		)
+elseif(MINGW)
+	set(WHEEL_TEST_DEPS
+		${WHEEL_TEST_DEPS}
+		setupapi
+		)
 endif()
+	
 
 # Build test
 add_executable(WHEEL_TEST_BIN ${WHEEL_TEST_SRCS})

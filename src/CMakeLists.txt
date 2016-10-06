@@ -25,6 +25,12 @@ find_path(SERIALPORT_INCLUDE_DIR libserialport.h
 	"/usr/local/include"
 	)
 set(WHEEL_DEPS ${SERIALPORT_LIB})
+if(MINGW)
+	set(WHEEL_DEPS
+		${WHEEL_DEPS}
+		setupapi
+		)
+endif()
 include_directories(${SERIALPORT_INCLUDE_DIR})
 
 # Build Wheel library
