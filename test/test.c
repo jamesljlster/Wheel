@@ -37,51 +37,44 @@ int main(int argc, char* argv[])
 		printf("Failed to open Wheel device!\n");
         return -1;
     }
-	
+
 	// Find control delay
 	ctrlDelay = atoi(argv[3]);
-	
+
 	// Manual controlling
-	printf("Press WASD to test Wheel, or ESC to exit...\n");
+	printf("Press WASDQ to test Wheel, or ESC to exit...\n");
 	kbin = 0;
 	while(kbin != 27)
 	{
-		if(kbhit())
-		{
-			kbin = getch();
-			switch(toupper(kbin))
-			{
-			case 'W':
-				leftSpeed = BASE_SPEED;
-				rightSpeed = BASE_SPEED;
-				break;
+        kbin = getch();
+        switch(toupper(kbin))
+        {
+        case 'W':
+            leftSpeed = BASE_SPEED;
+            rightSpeed = BASE_SPEED;
+            break;
 
-			case 'A':
-				leftSpeed = 510 - BASE_SPEED;
-				rightSpeed = BASE_SPEED;
-				break;
+        case 'A':
+            leftSpeed = 510 - BASE_SPEED;
+            rightSpeed = BASE_SPEED;
+            break;
 
-			case 'S':
-				leftSpeed = 510 - BASE_SPEED;
-				rightSpeed = 510 - BASE_SPEED;
-				break;
+        case 'S':
+            leftSpeed = 510 - BASE_SPEED;
+            rightSpeed = 510 - BASE_SPEED;
+            break;
 
-			case 'D':
-				leftSpeed = BASE_SPEED;
-				rightSpeed = 510 - BASE_SPEED;
-				break;
+        case 'D':
+            leftSpeed = BASE_SPEED;
+            rightSpeed = 510 - BASE_SPEED;
+            break;
 
-			default:
-				leftSpeed = 255;
-				rightSpeed = 255;
-			}
-		}
-		else
-		{
-			leftSpeed = 255;
-			rightSpeed = 255;
-		}
-		
+        case 'Q':
+        default:
+            leftSpeed = 255;
+            rightSpeed = 255;
+        }
+
 		// Controlling
 		iResult = WCTRL_Control(wCtrl, leftSpeed, rightSpeed, ctrlDelay);
         if(iResult != WCTRL_NO_ERROR)
