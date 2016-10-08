@@ -1,17 +1,20 @@
 cmake_minimum_required(VERSION 2.8)
 
+# Variables
+set(PROJECT_NAME Wheel)
+
 # Set project
-project(Wheel C CXX)
+project(${PROJECT_NAME} C CXX)
 
 # Include directory
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # Set file list
-set(WHEEL_SRCS
+set(PROJECT_SRCS
 	${CMAKE_CURRENT_SOURCE_DIR}/Wheel.c
 	)
 
-set(WHEEL_HEADER
+set(PROJECT_HEADER
 	${CMAKE_CURRENT_SOURCE_DIR}/Wheel.h
 	)
 
@@ -24,27 +27,27 @@ find_path(SERIALPORT_INCLUDE_DIR libserialport.h
 	"/usr/include"
 	"/usr/local/include"
 	)
-set(WHEEL_DEPS ${SERIALPORT_LIB})
+set(PROJECT_DEPS ${SERIALPORT_LIB})
 if(MINGW)
-	set(WHEEL_DEPS
-		${WHEEL_DEPS}
+	set(PROJECT_DEPS
+		${PROJECT_DEPS}
 		setupapi
 		)
 endif()
 include_directories(${SERIALPORT_INCLUDE_DIR})
 
 # Build Wheel library
-add_library(Wheel STATIC ${WHEEL_SRCS})
-set_target_properties(Wheel
+add_library(${PROJECT_NAME} STATIC ${PROJECT_SRCS})
+set_target_properties(${PROJECT_NAME}
 	PROPERTIES
-		OUTPUT_NAME		"Wheel"
+		OUTPUT_NAME		${PROJECT_NAME}
 		PREFIX			"lib"
-		PUBLIC_HEADER	${WHEEL_HEADER}
+		PUBLIC_HEADER	${PROJECT_HEADER}
 	)
-target_link_libraries(Wheel ${WHEEL_DEPS})
+target_link_libraries(${PROJECT_NAME} ${PROJECT_DEPS})
 
 # Install
-install(TARGETS Wheel
+install(TARGETS ${PROJECT_NAME}
 	RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
 	ARCHIVE DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
 	LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
