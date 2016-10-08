@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
     iResult = WCTRL_Init(&wCtrl, argv[1], atoi(argv[2]));
     if(iResult != WCTRL_NO_ERROR)
     {
-		printf("Failed to open Wheel device!\n");
+		printf("Failed to open Wheel with device: %s, baudrate: %d\n", argv[1], atoi(argv[2]));
         return -1;
     }
 
