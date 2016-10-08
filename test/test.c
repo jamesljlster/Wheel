@@ -3,19 +3,22 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
 
 #include <Wheel.h>
 
-#define BASE_SPEED 330
+#define BASE_SPEED 		330
+#define MIN_TIME_GAP	200
 
 int main(int argc, char* argv[])
 {
     int i;
     int iResult;
 	int ctrlDelay;
-	int leftSpeed;
-	int rightSpeed;
+	int leftSpeed, rightSpeed;
+	int renew;
 	char kbin;
+	time_t timeHold;
     WCTRL wCtrl;
 
 	// Check main args
@@ -42,38 +45,62 @@ int main(int argc, char* argv[])
 	ctrlDelay = atoi(argv[3]);
 
 	// Manual controlling
-	printf("Press WASDQ to test Wheel, or ESC to exit...\n");
+	printf("Press WASD to test Wheel, or ESC to exit...\n");
 	kbin = 0;
+	renew = 0;
+	timeHold = clock();
+	leftSpeed = 255;
+	rightSpeed = 255;
 	while(kbin != 27)
 	{
-        kbin = getch();
-        switch(toupper(kbin))
-        {
-        case 'W':
-            leftSpeed = BASE_SPEED;
-            rightSpeed = BASE_SPEED;
-            break;
+		// Get keyboard input
+		if(kbhit())
+		{
+			kbin = getch();
+			timeHold = clock();
+			renew = 1;
+		}
+		
+		// Find speeds
+		if(clock() - timeHold > MIN_TIME_GAP)
+		{
+			renew = 0;
+		}
 
-        case 'A':
-            leftSpeed = 510 - BASE_SPEED;
-            rightSpeed = BASE_SPEED;
-            break;
+		if(renew == 0)
+		{
+			leftSpeed = 255;
+			rightSpeed = 255;
+		}
+		else
+		{
+			switch(toupper(kbin))
+			{
+			case 'W':
+				leftSpeed = BASE_SPEED;
+				rightSpeed = BASE_SPEED;
+				break;
 
-        case 'S':
-            leftSpeed = 510 - BASE_SPEED;
-            rightSpeed = 510 - BASE_SPEED;
-            break;
+			case 'A':
+				leftSpeed = 510 - BASE_SPEED;
+				rightSpeed = BASE_SPEED;
+				break;
 
-        case 'D':
-            leftSpeed = BASE_SPEED;
-            rightSpeed = 510 - BASE_SPEED;
-            break;
+			case 'S':
+				leftSpeed = 510 - BASE_SPEED;
+				rightSpeed = 510 - BASE_SPEED;
+				break;
 
-        case 'Q':
-        default:
-            leftSpeed = 255;
-            rightSpeed = 255;
-        }
+			case 'D':
+				leftSpeed = BASE_SPEED;
+				rightSpeed = 510 - BASE_SPEED;
+				break;
+
+			default:
+				leftSpeed = 255;
+				rightSpeed = 255;
+			}
+		}
 
 		// Controlling
 		iResult = WCTRL_Control(wCtrl, leftSpeed, rightSpeed, ctrlDelay);
