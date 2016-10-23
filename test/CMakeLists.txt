@@ -1,14 +1,12 @@
 cmake_minimum_required(VERSION 2.8)
 
-# Variables
-set(PROJECT_NAME Wheel_test)
-
 # Set project
-project(${PROJECT_NAME} C CXX)
+project(Wheel_Test C CXX)
 
 # Set file list
-set(PROJECT_SRCS
-	${CMAKE_CURRENT_SOURCE_DIR}/test.c
+file(GLOB PROJECT_SRCS 
+	${CMAKE_CURRENT_SOURCE_DIR}/*.c
+	${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
 	)
 
 # Set dependences
@@ -22,8 +20,13 @@ find_path(SERIALPORT_INCLUDE_DIR libserialport.h
 	)
 include_directories(${SERIALPORT_INCLUDE_DIR})
 
-set(PROJECT_DEPS ${SERIALPORT_LIB} Wheel)
-if(UNIX)
+set(PROJECT_DEPS Wheel ${SERIALPORT_LIB})
+if(MINGW)
+	set(PROJECT_DEPS
+		${PROJECT_DEPS}
+		setupapi
+		)
+elseif(UNIX)
 	find_library(CONIO_LIB conio
 		"/usr/lib"
 		"/usr/local/lib"
@@ -37,23 +40,24 @@ if(UNIX)
 		${PROJECT_DEPS}
 		${CONIO_LIB}
 		)
-elseif(MINGW)
-	set(PROJECT_DEPS
-		${PROJECT_DEPS}
-		setupapi
-		)
+
 endif()
-	
 
 # Build test
-add_executable(${PROJECT_NAME} ${PROJECT_SRCS})
-set_target_properties(${PROJECT_NAME}
-	PROPERTIES
-	OUTPUT_NAME	${PROJECT_NAME}
-)
-target_link_libraries(${PROJECT_NAME} ${PROJECT_DEPS})
+foreach(TEST_FILE_PATH ${PROJECT_SRCS})
+	# Get each file name
+	get_filename_component(TEST_FILE_NAME ${TEST_FILE_PATH} NAME_WE)
+	
+	# Build executable
+	add_executable(${TEST_FILE_NAME} ${TEST_FILE_PATH})
+	set_target_properties(${TEST_FILE_NAME}
+		PROPERTIES OUTPUT_NAME ${TEST_FILE_NAME}
+		)
+	target_link_libraries(${TEST_FILE_NAME} ${PROJECT_DEPS})
 
-# Install
-install(TARGETS ${PROJECT_NAME}
-	RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
-)
+	# Install
+	install(TARGETS ${TEST_FILE_NAME}
+		RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
+		)
+endforeach()
+
