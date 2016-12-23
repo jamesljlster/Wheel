@@ -1,12 +1,11 @@
 cmake_minimum_required(VERSION 2.8)
 
 # Set project
-project(Wheel_Test C CXX)
+project(Wheel_Test C)
 
 # Set file list
 file(GLOB PROJECT_SRCS 
 	${CMAKE_CURRENT_SOURCE_DIR}/*.c
-	${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
 	)
 
 # Set dependences
