@@ -146,19 +146,23 @@ void loop()
 
 void serialEvent()
 {
-  char tmp;
-  
-  while(Serial.available())
+  if(recvCompelete == 0)
   {
-    tmp = Serial.read();
-    if(tmp == WHEEL_HEAD_CHAR)
-      bufIndex = 0;
-    recvBuf[bufIndex++] = tmp;
-    if(bufIndex >= BUFFER_LENGTH - 1)
+    while(Serial.available())
     {
-      if(recvBuf[0] == WHEEL_HEAD_CHAR)
-        recvCompelete = 1;
-      bufIndex = 0;
+      char tmp = Serial.read();
+      if(tmp == WHEEL_HEAD_CHAR)
+        bufIndex = 0;
+      recvBuf[bufIndex++] = tmp;
+      if(bufIndex >= BUFFER_LENGTH - 1)
+      {
+        bufIndex = 0;
+        if(recvBuf[0] == WHEEL_HEAD_CHAR)
+        {
+          recvCompelete = 1;
+          break;
+        }
+      }
     }
   }
 }
