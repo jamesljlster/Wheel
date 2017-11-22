@@ -17,7 +17,6 @@
 #define STOP_SPEED  255
 
 //#define DEBUG
-#define ENABLE_ECHO
 
 int bufIndex = 0;
 char recvBuf[BUFFER_LENGTH] = {0};
@@ -113,10 +112,6 @@ void loop()
   // If receiving compeleted, update control delta.
   if(recvCompelete)
   {
-    #ifdef ENABLE_ECHO
-    Serial.println(recvBuf);
-    #endif
-
     // Update control variable
     update_delta();
     
@@ -125,6 +120,9 @@ void loop()
 
     // Reset receive status
     recvCompelete = 0;
+
+	// Echo
+    Serial.println(recvBuf);
   }
 }
 

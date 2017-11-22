@@ -50,7 +50,6 @@ void loop()
 
   // Serial receiving
   RecvString(recvBuf);
-  Serial.print(recvBuf);
 
   // Decode
   Decode(recvBuf, &leftSpeed, &rightSpeed);
@@ -66,6 +65,9 @@ void loop()
 
   // Controlling
   CtrlMotor(leftSpeed, rightSpeed);
+
+  // Echo
+  Serial.print(recvBuf);
 }
 
 void Decode(char* recvBuf, int* leftSpeedPtr, int* rightSpeedPtr)
