@@ -146,8 +146,8 @@ void loop()
     // Reset receive status
     recvCompelete = 0;
 
-	// Echo
-    Serial.println(recvBuf);
+    // Send response
+    Serial.println("WOK");
   }
 }
 

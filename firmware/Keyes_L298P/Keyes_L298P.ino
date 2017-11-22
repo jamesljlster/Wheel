@@ -66,8 +66,8 @@ void loop()
   // Controlling
   CtrlMotor(leftSpeed, rightSpeed);
 
-  // Echo
-  Serial.print(recvBuf);
+  // Send response
+  Serial.print("WOK");
 }
 
 void Decode(char* recvBuf, int* leftSpeedPtr, int* rightSpeedPtr)
