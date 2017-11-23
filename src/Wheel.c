@@ -4,20 +4,26 @@
 #include <libserialport.h>
 
 #include "Wheel.h"
+#include "debug.h"
 
 #define WCTRL_HEAD_CHAR 'W'
 #define WCTRL_BUFLEN    7
 
 #define WCTRL_RESP_STR	"WOK"
+#define DEFAULT_TIMEOUT	200
 
 #define WCTRL_MIN_SPEED 0
 #define WCTRL_MAX_SPEED 510
 
-int WCTRL_Init(WCTRL* wheelCtrlPtr, const char* deviceName, int baudrate)
+int WCTRL_Init(WCTRL* wheelCtrlPtr, const char* deviceName, int baudrate, int timeout)
 {
     int iResult;
+	int respStrLen;
+    char ctrlBuf[WCTRL_BUFLEN + 1] = {0};
 
     struct sp_port* serialPort;
+
+	LOG("Using device: %s, baudrate: %d", deviceName, baudrate);
 
     // Get Port
     iResult = sp_get_port_by_name(deviceName, &serialPort);
@@ -52,6 +58,27 @@ int WCTRL_Init(WCTRL* wheelCtrlPtr, const char* deviceName, int baudrate)
         return WCTRL_SERIAL_FAILED;
     }
 
+	// Get response
+	respStrLen = strlen(WCTRL_RESP_STR);
+	iResult = sp_blocking_read(serialPort, ctrlBuf, respStrLen, timeout);
+	if(iResult > 0)
+	{
+		ctrlBuf[iResult] = '\0';
+	}
+
+	LOG("Receive: %s", ctrlBuf);
+	if(iResult != respStrLen)
+	{
+		LOG("Serial read timeout!");
+		return WCTRL_TIMEOUT;
+	}
+
+	// Check response
+	if(strcmp(ctrlBuf, WCTRL_RESP_STR) != 0)
+	{
+		return WCTRL_WRONG_RESPONSE;
+	}
+
     // Set serial port reference
     *wheelCtrlPtr = (WCTRL)serialPort;
 
@@ -64,11 +91,10 @@ int WCTRL_Control(WCTRL wheelCtrl, int leftSpeed, int rightSpeed, int timeout)
     char ctrlBuf[WCTRL_BUFLEN + 1] = {0};
     struct sp_port* serialPort = (struct sp_port*)wheelCtrl;
 
-	int timeCost;
+	int timeLeft;
 	struct timespec timeHold, tmpTime;
 
-	char tmpRead;
-	int respStrLen, counter;
+	int respStrLen;
 
     // Check if speed all legal
     if(leftSpeed < WCTRL_MIN_SPEED || leftSpeed > WCTRL_MAX_SPEED)
@@ -95,46 +121,27 @@ int WCTRL_Control(WCTRL wheelCtrl, int leftSpeed, int rightSpeed, int timeout)
 
 	// Get response
 	respStrLen = strlen(WCTRL_RESP_STR);
-	counter = 0;
-	while(1)
+	clock_gettime(CLOCK_MONOTONIC, &tmpTime);
+	tmpTime.tv_sec = tmpTime.tv_sec - timeHold.tv_sec;
+	tmpTime.tv_nsec = tmpTime.tv_nsec - timeHold.tv_nsec;
+	timeLeft = timeout - (tmpTime.tv_sec * 1000 + tmpTime.tv_nsec / 1000000);
+	LOG("timeLeft = %d", timeLeft);
+	if(timeLeft <= 0)
 	{
-		// Checking time cost
-		clock_gettime(CLOCK_MONOTONIC, &tmpTime);
-		tmpTime.tv_sec = tmpTime.tv_sec - timeHold.tv_sec;
-		tmpTime.tv_nsec = tmpTime.tv_nsec - timeHold.tv_nsec;
-		timeCost = tmpTime.tv_sec * 1000 + tmpTime.tv_nsec / 1000;
-		if(timeCost >= timeout)
-		{
-			return WCTRL_TIMEOUT;
-		}
+		return WCTRL_TIMEOUT;
+	}
 
-		// Non-blocking reading
-		iResult = sp_nonblocking_read(serialPort, &tmpRead, sizeof(char));
-		if(iResult == 0)
-		{
-			continue;
-		}
-		else if(iResult < 0)
-		{
-			return WCTRL_SERIAL_FAILED;
-		}
+	iResult = sp_blocking_read(serialPort, ctrlBuf, respStrLen, timeLeft);
+	if(iResult > 0)
+	{
+		ctrlBuf[iResult] = '\0';
+	}
 
-		// Check and store received data
-		if(counter == 0 && tmpRead != WCTRL_HEAD_CHAR)
-		{
-			continue;
-		}
-		else
-		{
-			ctrlBuf[counter++] = tmpRead;
-		}
-
-		// Check if finished
-		if(counter == respStrLen)
-		{
-			ctrlBuf[counter] = '\0';
-			break;
-		}
+	LOG("Receive: %s", ctrlBuf);
+	if(iResult != respStrLen)
+	{
+		LOG("Serial read timeout!");
+		return WCTRL_TIMEOUT;
 	}
 
 	// Check response
