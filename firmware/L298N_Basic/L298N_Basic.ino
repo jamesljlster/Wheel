@@ -16,6 +16,8 @@
 #define MIN_SPEED   0
 #define STOP_SPEED  255
 
+#define RESP  "WOK"
+
 //#define DEBUG
 
 int bufIndex = 0;
@@ -105,6 +107,9 @@ void setup()
 
   // Initial control
   ctrl_wheel();
+  
+  // Send startup response
+  Serial.print(RESP);
 }
 
 void loop()
@@ -122,7 +127,7 @@ void loop()
     recvCompelete = 0;
 
     // Send response
-    Serial.print("WOK");
+    Serial.print(RESP);
   }
 }
 
