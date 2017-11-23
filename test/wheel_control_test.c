@@ -24,15 +24,15 @@ long int get_diff_ms(struct timespec* start, struct timespec* end)
 
 int main(int argc, char* argv[])
 {
-    int i;
-    int iResult;
+	int i;
+	int iResult;
 	int timeout;
 	int baudrate;
 	int leftSpeed, rightSpeed;
 	int renew;
 	char kbin;
 	struct timespec timeHold, tmpTime;
-    WCTRL wCtrl;
+	WCTRL wCtrl;
 
 	// Check main args
 	if(argc < 4)
@@ -58,12 +58,12 @@ int main(int argc, char* argv[])
 	printf("\n");
 
 	// Open device
-    iResult = WCTRL_Init(&wCtrl, argv[1], baudrate, STARTUP_TIMEOUT);
-    if(iResult != WCTRL_NO_ERROR)
-    {
+	iResult = WCTRL_Init(&wCtrl, argv[1], baudrate, STARTUP_TIMEOUT);
+	if(iResult != WCTRL_NO_ERROR)
+	{
 		printf("Failed to open Wheel with device: %s, baudrate: %d\n", argv[1], baudrate);
-        return -1;
-    }
+		return -1;
+	}
 
 	// Manual controlling
 	printf("Press WASD to test Wheel, or ESC to exit...\n");
@@ -98,48 +98,48 @@ int main(int argc, char* argv[])
 		{
 			switch(toupper(kbin))
 			{
-			case 'W':
-				leftSpeed = BASE_SPEED;
-				rightSpeed = BASE_SPEED;
-				break;
+				case 'W':
+					leftSpeed = BASE_SPEED;
+					rightSpeed = BASE_SPEED;
+					break;
 
-			case 'A':
-				leftSpeed = 510 - BASE_SPEED;
-				rightSpeed = BASE_SPEED;
-				break;
+				case 'A':
+					leftSpeed = 510 - BASE_SPEED;
+					rightSpeed = BASE_SPEED;
+					break;
 
-			case 'S':
-				leftSpeed = 510 - BASE_SPEED;
-				rightSpeed = 510 - BASE_SPEED;
-				break;
+				case 'S':
+					leftSpeed = 510 - BASE_SPEED;
+					rightSpeed = 510 - BASE_SPEED;
+					break;
 
-			case 'D':
-				leftSpeed = BASE_SPEED;
-				rightSpeed = 510 - BASE_SPEED;
-				break;
+				case 'D':
+					leftSpeed = BASE_SPEED;
+					rightSpeed = 510 - BASE_SPEED;
+					break;
 
-			default:
-				leftSpeed = 255;
-				rightSpeed = 255;
+				default:
+					leftSpeed = 255;
+					rightSpeed = 255;
 			}
 		}
 
 		// Controlling
 		iResult = WCTRL_Control(wCtrl, leftSpeed, rightSpeed, timeout);
-        if(iResult != WCTRL_NO_ERROR)
-        {
+		if(iResult != WCTRL_NO_ERROR)
+		{
 			printf("Wheel control failed with error: %d\n", iResult);
-            return -1;
-        }
+			return -1;
+		}
 	}
 
 	// Cleanup
-    iResult = WCTRL_Close(wCtrl);
-    if(iResult != WCTRL_NO_ERROR)
-    {
+	iResult = WCTRL_Close(wCtrl);
+	if(iResult != WCTRL_NO_ERROR)
+	{
 		printf("Failed to close device!\n");
-        return -1;
-    }
+		return -1;
+	}
 
-    return 0;
+	return 0;
 }
