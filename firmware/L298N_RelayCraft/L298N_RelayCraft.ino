@@ -147,7 +147,7 @@ void loop()
     recvCompelete = 0;
 
     // Send response
-    Serial.println("WOK");
+    Serial.print("WOK");
   }
 }
 

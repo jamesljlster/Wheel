@@ -9,7 +9,7 @@
 // Serial definition
 #define WHEEL_HEAD_CHAR   'W'
 #define BUFFER_LENGTH     8
-#define BAUDRATE          9600
+#define BAUDRATE          38400
 
 // Control limit
 #define MAX_SPEED   510
@@ -122,7 +122,7 @@ void loop()
     recvCompelete = 0;
 
     // Send response
-    Serial.println("WOK");
+    Serial.print("WOK");
   }
 }
 
