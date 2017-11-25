@@ -1,17 +1,14 @@
 #include <SoftwareSerial.h>
 
 // Pin definition
-#define A_OPEN_PIN    5
-#define A_ENABLE_PIN  4
-#define A_SPEED_PIN   3
-#define A_BRAKE_PIN   2
+#define PWMA  11
+#define PWMB  10
 
-#define B_OPEN_PIN    9
-#define B_ENABLE_PIN  12
-#define B_SPEED_PIN   11
-#define B_BRAKE_PIN   10
-
-#define SPEED_PIN_MODE  0x03
+#define AIN1  9
+#define AIN2  8
+#define STBY  7
+#define BIN1  6
+#define BIN2  5
 
 // Serial definition
 #define WHEEL_HEAD_CHAR   'W'
@@ -31,26 +28,27 @@ int bufIndex = 0;
 char recvBuf[BUFFER_LENGTH] = {0};
 int recvCompelete = 0;
 
-int motorL_open = 0;
-int motorL_enable = 0;
+int standby = HIGH;
+
 int motorL_speed = 0;
-int motorL_brake = 0;
-int motorR_open = 0;
-int motorR_enable = 0;
+int motorL_in1 = 0;
+int motorL_in2 = 0;
+
 int motorR_speed = 0;
-int motorR_brake = 0;
+int motorR_in1 = 0;
+int motorR_in2 = 0;
 
 void ctrl_wheel()
 {
-  digitalWrite(A_ENABLE_PIN, motorR_enable);
-  digitalWrite(A_OPEN_PIN, motorR_open);
-  analogWrite(A_SPEED_PIN, motorR_speed);
-  digitalWrite(A_BRAKE_PIN, motorR_brake);
+  digitalWrite(STBY, standby);
 
-  digitalWrite(B_ENABLE_PIN, motorL_enable);
-  digitalWrite(B_OPEN_PIN, motorL_open);
-  analogWrite(B_SPEED_PIN, motorL_speed);
-  digitalWrite(B_BRAKE_PIN, motorL_brake);
+  analogWrite(PWMA, motorR_speed);
+  digitalWrite(AIN1, motorR_in1);
+  digitalWrite(AIN2, motorR_in2);
+  
+  analogWrite(PWMB, motorL_speed);
+  digitalWrite(BIN1, motorL_in1);
+  digitalWrite(BIN2, motorL_in2);
 }
 
 void update_delta()
@@ -65,32 +63,46 @@ void update_delta()
   {
     if(sal == 255)
     {
-      motorL_enable = LOW;
-      motorL_open = HIGH;
-      motorL_speed = 127;
-      motorL_brake = HIGH;
+      motorL_speed = 255;
+      motorL_in1 = HIGH;
+      motorL_in2 = HIGH;
     }
     else
     {
-      motorL_enable = HIGH;
-      motorL_open = LOW;
-      motorL_speed = sal / 2;
-      motorL_brake = LOW;
+      int speedTmp = sal - 255;
+      motorL_speed = abs(speedTmp);
+      if(speedTmp > 0)
+      {
+        motorL_in1 = LOW;
+        motorL_in2 = HIGH;
+      }
+      else
+      {
+        motorL_in1 = HIGH;
+        motorL_in2 = LOW;
+      }
     }
 
     if(sar == 255)
     {
-      motorR_enable = LOW;
-      motorR_open = HIGH;
-      motorR_speed = 127;
-      motorR_brake = HIGH;
+      motorR_speed = 255;
+      motorR_in1 = HIGH;
+      motorR_in2 = HIGH;
     }
     else
     {
-      motorR_enable = HIGH;
-      motorR_open = LOW;
-      motorR_speed = sar / 2;
-      motorR_brake = LOW;
+      int speedTmp = sar - 255;
+      motorR_speed = abs(speedTmp);
+      if(speedTmp > 0)
+      {
+        motorR_in1 = HIGH;
+        motorR_in2 = LOW;
+      }
+      else
+      {
+        motorR_in1 = LOW;
+        motorR_in2 = HIGH;
+      }
     }
     
     #ifdef DEBUG
@@ -104,27 +116,22 @@ void update_delta()
 
 void setup()
 {
-  // Set speed pin frequency
-  TCCR2B = (TCCR2B & 0b11111000) | SPEED_PIN_MODE;
-
   // Initial pin mode
-  pinMode(A_OPEN_PIN, OUTPUT);
-  pinMode(A_ENABLE_PIN, OUTPUT);
-  pinMode(A_SPEED_PIN, OUTPUT);
-  pinMode(A_BRAKE_PIN, OUTPUT);
-  pinMode(B_OPEN_PIN, OUTPUT);
-  pinMode(B_ENABLE_PIN, OUTPUT);
-  pinMode(B_SPEED_PIN, OUTPUT);
-  pinMode(B_BRAKE_PIN, OUTPUT);
+  pinMode(PWMA, OUTPUT);
+  pinMode(PWMB, OUTPUT);
+  pinMode(AIN1, OUTPUT);
+  pinMode(AIN2, OUTPUT);
+  pinMode(STBY, OUTPUT);
+  pinMode(BIN1, OUTPUT);
+  pinMode(BIN2, OUTPUT);
 
-  digitalWrite(A_OPEN_PIN, LOW);
-  digitalWrite(A_ENABLE_PIN, LOW);
-  digitalWrite(A_SPEED_PIN, LOW);
-  digitalWrite(A_BRAKE_PIN, LOW);
-  digitalWrite(B_OPEN_PIN, LOW);
-  digitalWrite(B_ENABLE_PIN, LOW);
-  digitalWrite(B_SPEED_PIN, LOW);
-  digitalWrite(B_BRAKE_PIN, LOW);
+  digitalWrite(PWMA, LOW);
+  digitalWrite(PWMB, LOW);
+  digitalWrite(AIN1, LOW);
+  digitalWrite(AIN2, LOW);
+  digitalWrite(STBY, LOW);
+  digitalWrite(BIN1, LOW);
+  digitalWrite(BIN2, LOW);
 
   // Setup serial
   Serial.begin(BAUDRATE);

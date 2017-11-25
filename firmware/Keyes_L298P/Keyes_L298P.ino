@@ -17,6 +17,8 @@
 #define MIN_SPEED   0
 #define STOP_SPEED  255
 
+#define RESP  "WOK"
+
 //#define DEBUG
 
 void Decode(char* recvBuf, int* leftSpeedPtr, int* rightSpeedPtr);
@@ -26,6 +28,7 @@ void RecvString(char* recvBuf);
 void setup()
 {
   Serial.begin(BAUDRATE);
+  while(!Serial);
   
   pinMode(MOTOR_A_DIRECTION, OUTPUT);
   pinMode(MOTOR_B_DIRECTION, OUTPUT);
@@ -37,6 +40,9 @@ void setup()
   // Stop Motor B
   digitalWrite(MOTOR_B_DIRECTION, HIGH);
   analogWrite(MOTOR_B_PWM, 0);
+  
+  // Send startup response
+  Serial.print(RESP);
 }
 
 void loop()
@@ -50,7 +56,6 @@ void loop()
 
   // Serial receiving
   RecvString(recvBuf);
-  Serial.print(recvBuf);
 
   // Decode
   Decode(recvBuf, &leftSpeed, &rightSpeed);
@@ -66,6 +71,9 @@ void loop()
 
   // Controlling
   CtrlMotor(leftSpeed, rightSpeed);
+
+  // Send response
+  Serial.print(RESP);
 }
 
 void Decode(char* recvBuf, int* leftSpeedPtr, int* rightSpeedPtr)

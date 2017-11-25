@@ -9,15 +9,16 @@
 // Serial definition
 #define WHEEL_HEAD_CHAR   'W'
 #define BUFFER_LENGTH     8
-#define BAUDRATE          9600
+#define BAUDRATE          38400
 
 // Control limit
 #define MAX_SPEED   510
 #define MIN_SPEED   0
 #define STOP_SPEED  255
 
+#define RESP  "WOK"
+
 //#define DEBUG
-#define ENABLE_ECHO
 
 int bufIndex = 0;
 char recvBuf[BUFFER_LENGTH] = {0};
@@ -106,6 +107,9 @@ void setup()
 
   // Initial control
   ctrl_wheel();
+  
+  // Send startup response
+  Serial.print(RESP);
 }
 
 void loop()
@@ -113,10 +117,6 @@ void loop()
   // If receiving compeleted, update control delta.
   if(recvCompelete)
   {
-    #ifdef ENABLE_ECHO
-    Serial.println(recvBuf);
-    #endif
-
     // Update control variable
     update_delta();
     
@@ -125,6 +125,9 @@ void loop()
 
     // Reset receive status
     recvCompelete = 0;
+
+    // Send response
+    Serial.print(RESP);
   }
 }
 

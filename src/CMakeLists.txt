@@ -5,9 +5,22 @@ set(CMAKE_C_FLAGS_RELEASE "-O3")
 
 # Variables
 set(PROJECT_NAME Wheel)
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Build confugure" FORCE)
+if(DEFINED CMAKE_BUILD_TYPE)
+	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_CONFIGURATION_TYPES})
+endif()
+if(NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE Release)
+endif()
+
 
 # Set project
 project(${PROJECT_NAME} C)
+
+# Add definition
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+	add_definitions(-DDEBUG)
+endif()
 
 # Include directory
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
